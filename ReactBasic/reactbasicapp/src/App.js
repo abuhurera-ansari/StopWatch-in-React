@@ -1,68 +1,71 @@
-// import logo from './logo.svg';
+
 import './App.css';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from "react";
 
-const allBrands = [
-  {id: "1", brandName: "puma"},
-  {id: "2", brandName: "adidas"},
-  {id: "3", brandName: "bata"},
-  {id: "4", brandName: "fila"},
-  {id: "5", brandName: "reebok"}
-];
+function Stopwatch() {
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (isRunning) {
+      timerRef.current = setInterval(() => {
+        setTime((prevTime) => prevTime + 10);
+      }, 10);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isRunning]);
+
+  const handleStartStop = () => {
+    setIsRunning(!isRunning);
+  };
+
+  const handleReset = () => {
+    setIsRunning(false);
+    setTime(0);
+  };
+
+  const formatTime = () => {
+    const minutes = Math.floor(time / 60000);
+    const seconds = Math.floor((time % 60000) / 1000);
+    const milliseconds = Math.floor((time % 1000) / 10);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}:${String(milliseconds).padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="container">
+      <h1>Stopwatch</h1>
+      <div className="time-display">{formatTime()}</div>
+      <div className="button-group">
+        <button
+          onClick={handleStartStop}
+          className={`start-stop-btn ${isRunning ? "stop" : ""}`}
+        >
+          {isRunning ? "Stop" : "Start"}
+        </button>
+        <button
+          onClick={handleReset}
+          className="reset-btn"
+          disabled={time === 0}
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+  );
+}
 
 
 function App() {
-  const [brands, setBrands] = useState(allBrands);
-
-  const [selectedBrand, setSelectedBrand] = useState([]);
-
-  const onSearchChange = (e)=> {
-    const value = e.target.value;
-    const filteredBrands = value?.length > 0 ? brands.filter(brand => brand.brandName.includes(value.toLowerCase())) : allBrands;
-    setBrands(filteredBrands);
-    console.log(filteredBrands);
-    
-  }; 
-
-  const onAddClick = (id)=> {
-    const selectedItems = allBrands.find(item => item.id === id);
-    setSelectedBrand([...selectedBrand,selectedItems]);
-  }
-
-  const onClickRemove = (id)=> {
-    const filteredItems = selectedBrand.filter(brand => brand.id !== id);
-    setSelectedBrand(filteredItems);
-  }
-    
-
   return (
     <>
-      <input onChange={onSearchChange} placeholder="Search a brand" />
-      <ul>
-        {brands.map((brand) => (
-          <li key={brand.id}>{brand.brandName}</li>
-        ))}
-      </ul>
-
-      <div>
-        <h3>Add Brands to Cart</h3>
-        {allBrands.map((brand) => (
-          <div>
-            {brand.brandName}
-            <span>
-              <button onClick={() => onAddClick(brand.id)}>Add to Cart</button>
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div>
-        <h2>Your Cart</h2>
-        <div>
-          {selectedBrand && selectedBrand.map((brand) => <p>{brand.brandName}-<button onClick={()=> onClickRemove(brand.id)}>Remove</button></p>)}
-        </div>
-      </div>
+      <Stopwatch />
     </>
   );
 }
