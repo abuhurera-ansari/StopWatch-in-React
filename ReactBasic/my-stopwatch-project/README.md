@@ -1,4 +1,4 @@
-React Stopwatch
+# React Stopwatch
 Overview
 This is a simple React-based stopwatch application built with functional components and hooks. It allows users to start, stop, and reset a timer that displays time in minutes, seconds, and milliseconds (MM:SS:MS). The app is styled with vanilla CSS for a clean and responsive user interface.
 Features
